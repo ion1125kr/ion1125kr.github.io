@@ -67,15 +67,15 @@ header{
 .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16.5px;letter-spacing:-.02em}
 .brand .dot{
   width:26px;height:26px;border-radius:50%;
-  background:radial-gradient(circle at 32% 28%,#cdeaff 0%,#8ecbff 55%,#6bb6f0 100%);
-  box-shadow:inset -2px -3px 6px rgba(90,169,230,.35),0 3px 8px rgba(90,169,230,.28);
+  background:radial-gradient(circle at 32% 28%,#d5dcff 0%,#a3b2f4 55%,#8a9cee 100%);
+  box-shadow:inset -2px -3px 6px rgba(110,130,225,.35),0 3px 8px rgba(110,130,225,.28);
   position:relative;flex:0 0 auto;
 }
 .brand .dot::before,.brand .dot::after{
-  content:"";position:absolute;top:9.5px;width:3.4px;height:4.6px;border-radius:50%;background:#25364c;
+  content:"";position:absolute;top:8.5px;width:3.6px;height:5.6px;border-radius:50%;background:#20283c;
 }
-.brand .dot::before{left:7.5px}
-.brand .dot::after{right:7.5px}
+.brand .dot::before{left:7.2px}
+.brand .dot::after{right:7.2px}
 .nav-links{display:flex;align-items:center;gap:26px;font-size:14.5px;color:var(--ink-soft)}
 .nav-links a{transition:color .2s}
 .nav-links a:hover{color:var(--sky-600)}
@@ -123,7 +123,7 @@ h1{
   margin:22px 0 0;
 }
 h1 .accent{
-  background:linear-gradient(120deg,#3d8fd1,#7cc4f5 60%,#a8d8fb);
+  background:linear-gradient(120deg,#4f7de0,#8fa3ee 55%,#b7c3f8);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .lead{
@@ -176,7 +176,7 @@ h1 .accent{
 }
 .portrait .badge .mini{
   width:24px;height:24px;border-radius:50%;
-  background:radial-gradient(circle at 32% 28%,#cdeaff,#8ecbff 60%,#6bb6f0);
+  background:radial-gradient(circle at 32% 28%,#d5dcff,#a3b2f4 60%,#8a9cee);
 }
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 .portrait .badge{animation:floaty 5.5s ease-in-out infinite}
@@ -298,7 +298,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   gap:14px;padding:30px 0;font-size:13.5px;color:var(--ink-mute);
 }
 .foot .left{display:flex;align-items:center;gap:10px}
-.foot .dot{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#cdeaff,#8ecbff 60%,#6bb6f0)}
+.foot .dot{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 32% 28%,#d5dcff,#a3b2f4 60%,#8a9cee)}
 .foot a:hover{color:var(--sky-600)}
 
 /* ---------- reveal ---------- */
@@ -363,10 +363,10 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
         <figure>
           <picture>
             <source srcset="ion.webp" type="image/webp">
-            <img src="ion.png" width="1313" height="1198" alt="노트북 앞에 앉아 있는 하늘색 털뭉치 캐릭터 이온" fetchpriority="high">
+            <img src="ion.png" width="799" height="799" alt="구름 위에 앉아 있는 연보라빛 하늘색 털뭉치 캐릭터 이온" fetchpriority="high">
           </picture>
         </figure>
-        <div class="badge"><span class="mini" aria-hidden="true"></span>오늘도 코딩하는 중</div>
+        <div class="badge"><span class="mini" aria-hidden="true"></span>구름 위에서 생각 중</div>
       </div>
     </div>
   </section>
