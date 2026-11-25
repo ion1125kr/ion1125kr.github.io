@@ -1093,7 +1093,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     }
     const shadowTex = new THREE.CanvasTexture(shadowCv);
     shadowTex.colorSpace = THREE.SRGBColorSpace;
-    const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.46, depthWrite: false });
+    const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.55, depthWrite: false });
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
     shadow.scale.set(1.46, 0.40, 1);
     shadow.position.set(0, -1.0, 0);
@@ -1105,7 +1105,25 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     const body = new THREE.Group();
     pet.add(body);
 
-    const ballGeo = new THREE.SphereGeometry(1, 96, 72);
+    const ballGeo = new THREE.SphereGeometry(1, 112, 84);
+    {
+      /* 바깥으로 살짝 흔들어 완전한 구체보다 털뭉치다운 실루엣으로 */
+      const posAttr = ballGeo.attributes.position;
+      const v = new THREE.Vector3();
+      const n = new THREE.Vector3();
+      for (let i = 0; i < posAttr.count; i++) {
+        v.fromBufferAttribute(posAttr, i);
+        n.copy(v).normalize();
+        const d = (
+          pfbm(n.x * 9 + 9, n.y * 9 + 9, 18, 3) +
+          pfbm(n.y * 9 + 9, n.z * 9 + 9, 18, 3) +
+          pfbm(n.z * 9 + 9, n.x * 9 + 9, 18, 3)
+        ) / 3 - 0.5;
+        v.copy(n).multiplyScalar(1 + d * 0.045);
+        posAttr.setXYZ(i, v.x, v.y, v.z);
+      }
+      ballGeo.computeVertexNormals();
+    }
     const baseMat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#9CB4FF'),
       roughness: 0.58,
@@ -1119,8 +1137,8 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     body.add(new THREE.Mesh(ballGeo, baseMat));
 
     /* 퍼 셸: 반투명 껍질을 겹쳐 보송한 실루엣 */
-    for (let i = 0; i < 5; i++) {
-      const sc = 1.014 + i * 0.013;
+    for (let i = 0; i < 6; i++) {
+      const sc = 1.012 + i * 0.016;
       const tex = furTex.clone();
       tex.needsUpdate = true;
       tex.repeat.set(7 + (i % 3), 4);
@@ -1130,7 +1148,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
         roughness: 0.95,
         metalness: 0,
         transparent: true,
-        opacity: 0.40 - i * 0.06,
+        opacity: 0.28 - i * 0.032,
         alphaMap: tex,
         depthWrite: false,
         side: THREE.FrontSide
@@ -1141,23 +1159,6 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       shell.renderOrder = 3 + i;
       body.add(shell);
     }
-
-    /* 프레넬 림 라이트 */
-    const rimMat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uColor: { value: new THREE.Color('#dbe7ff') },
-        uStrength: { value: 0.22 },
-        uPower: { value: 3.0 }
-      },
-      vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
-      fragmentShader: 'uniform vec3 uColor; uniform float uStrength; uniform float uPower; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - clamp(dot(normalize(vN), normalize(vV)), 0.0, 1.0), uPower); gl_FragColor = vec4(uColor, f * uStrength); }'
-    });
-    const rimMesh = new THREE.Mesh(new THREE.SphereGeometry(1.08, 64, 48), rimMat);
-    rimMesh.renderOrder = 9;
-    body.add(rimMesh);
 
     /* ---- 눈 ---- */
     const eyeRig = new THREE.Group();
@@ -1178,7 +1179,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       open.add(eyeball);
 
       const hl = new THREE.Mesh(new THREE.SphereGeometry(0.046, 20, 16), hlMat);
-      hl.position.set(-0.028, 0.105, 0.070);
+      hl.position.set(-0.022, 0.100, 0.068);
       hl.scale.set(1, 1.08, 0.5);
       open.add(hl);
       holder.add(open);
@@ -1453,7 +1454,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       const ss = 1 - lift * 0.34;
       shadow.position.x = st.x * 0.92;
       shadow.scale.set(1.46 * ss, 0.40 * ss, 1);
-      shadowMat.opacity = 0.46 * (1 - lift * 0.6);
+      shadowMat.opacity = 0.55 * (1 - lift * 0.6);
     }
 
     function resize() {
