@@ -1017,7 +1017,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 60);
-    camera.position.set(0, 0.10, 5.8);
+    camera.position.set(0, 0.10, 6.4);
     camera.lookAt(0, 0, 0);
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0xd6e4ff, 2.0));
@@ -1070,12 +1070,12 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       return tex;
     };
 
-    const bumpTex = makeGrayTex((u, v) => 0.24 + (pfbm(u * 6, v * 6, 6, 4) * 0.68 + pnoise(u * 68, v * 68, 68) * 0.32) * 0.58);
-    bumpTex.repeat.set(3, 3);
+    const bumpTex = makeGrayTex((u, v) => 0.30 + (pfbm(u * 16, v * 16, 16, 4) * 0.55 + pnoise(u * 96, v * 96, 96) * 0.45) * 0.50);
+    bumpTex.repeat.set(8, 5);
 
     const furTex = makeGrayTex((u, v) => {
-      const n = pfbm(u * 24, v * 24, 24, 3);
-      return Math.pow(clamp((n - 0.24) / 0.5, 0, 1), 0.8);
+      const n = pfbm(u * 46, v * 46, 46, 3);
+      return Math.pow(clamp((n - 0.26) / 0.46, 0, 1), 0.75);
     });
 
     /* ---- 바닥 소프트 그림자 ---- */
@@ -1114,7 +1114,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       sheenRoughness: 0.7,
       sheenColor: new THREE.Color('#EDF2FF'),
       bumpMap: bumpTex,
-      bumpScale: 0.022
+      bumpScale: 0.014
     });
     body.add(new THREE.Mesh(ballGeo, baseMat));
 
@@ -1123,14 +1123,14 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       const sc = 1.014 + i * 0.013;
       const tex = furTex.clone();
       tex.needsUpdate = true;
-      tex.repeat.set(3 + (i % 2), 2);
+      tex.repeat.set(7 + (i % 3), 4);
       tex.offset.set(Math.random(), Math.random());
       const mat = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color('#B7CAFF'),
+        color: new THREE.Color('#AEC4FF'),
         roughness: 0.95,
         metalness: 0,
         transparent: true,
-        opacity: 0.42 - i * 0.062,
+        opacity: 0.40 - i * 0.06,
         alphaMap: tex,
         depthWrite: false,
         side: THREE.FrontSide
@@ -1149,8 +1149,8 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       blending: THREE.AdditiveBlending,
       uniforms: {
         uColor: { value: new THREE.Color('#dbe7ff') },
-        uStrength: { value: 0.42 },
-        uPower: { value: 2.4 }
+        uStrength: { value: 0.22 },
+        uPower: { value: 3.0 }
       },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
       fragmentShader: 'uniform vec3 uColor; uniform float uStrength; uniform float uPower; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - clamp(dot(normalize(vN), normalize(vV)), 0.0, 1.0), uPower); gl_FragColor = vec4(uColor, f * uStrength); }'
@@ -1162,19 +1162,19 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     /* ---- 눈 ---- */
     const eyeRig = new THREE.Group();
     body.add(eyeRig);
-    const eyeMat = new THREE.MeshStandardMaterial({ color: new THREE.Color('#08090f'), roughness: 0.32, metalness: 0 });
+    const eyeMat = new THREE.MeshStandardMaterial({ color: new THREE.Color('#08090f'), roughness: 0.5, metalness: 0 });
     const hlMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const eyes = [];
 
     [-1, 1].forEach((sign) => {
       const holder = new THREE.Group();
       const dir = new THREE.Vector3(sign * 0.27, 0.175, 0.947).normalize();
-      holder.position.copy(dir).multiplyScalar(1.03);
+      holder.position.copy(dir).multiplyScalar(1.02);
       holder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir);
 
       const open = new THREE.Group();
       const eyeball = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 24), eyeMat);
-      eyeball.scale.set(0.093, 0.252, 0.10);
+      eyeball.scale.set(0.093, 0.252, 0.085);
       open.add(eyeball);
 
       const hl = new THREE.Mesh(new THREE.SphereGeometry(0.046, 20, 16), hlMat);
@@ -1194,7 +1194,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
 
     /* ---- 상태 ---- */
     const G = 7.4;
-    const XLIM = 0.34;
+    const XLIM = 0.38;
     const BASE_Y = 0.02;
     let t = 0;
 
