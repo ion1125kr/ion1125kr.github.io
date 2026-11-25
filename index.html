@@ -1051,7 +1051,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
 
     /* 한 방향으로 쭉 끌면 '잡아 들기', 문지르면 '쓰다듬기' */
     const net = Math.hypot(e.clientX - downX, e.clientY - downY);
-    if (!S.grabbed && net > 64 && pathLen < net * 1.9 && now - downT > 70) {
+    if (!S.grabbed && net > 58 && pathLen < net * 1.7) {
       startGrab();
     }
     if (S.grabbed) {
