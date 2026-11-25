@@ -672,7 +672,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       bubble.textContent = text;
       bubble.classList.add('show');
       clearTimeout(bubbleTimer);
-      bubbleTimer = setTimeout(() => bubble.classList.remove('show'), ms || 2400);
+      bubbleTimer = setTimeout(() => bubble.classList.remove('show'), ms || 3000);
     }
 
     /* 미니 파티클 */
@@ -729,7 +729,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       }, 4200);
       if (fresh) {
         const r = mascot.getBoundingClientRect();
-        say(pickLine(PET_LINES), 2600);
+        say(pickLine(PET_LINES), 3200);
         addTwinkles(6);
         burst(r.width * 0.5, r.height * 0.46, 10, 0.5);
       }
@@ -765,7 +765,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
         6,
         0.42
       );
-      say(pickLine(TAP_LINES), 2200);
+      say(pickLine(TAP_LINES), 3000);
     }
 
     /* 포인터 상태 */
@@ -780,7 +780,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     let petIdle = 0;
 
     function petBy(dx, dy, dist, strong) {
-      petAcc += strong ? dist : dist * 0.8;
+      petAcc += strong ? Math.min(dist, 45) : dist * 0.8;
       mascot.classList.add('is-petting');
       if (!img.classList.contains('jelly')) {
         tilt = clamp(tilt + dx * 0.5, -7, 7);
@@ -826,7 +826,8 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       lastX = e.clientX;
       lastY = e.clientY;
       const dist = Math.hypot(dx, dy);
-      if (dist < 0.8 || dist > 60) return;
+      if (dist < 0.8) return;
+      if (!isPressing && dist > 60) return;
       if (isPressing) moved += dist;
       petBy(dx, dy, dist, isPressing);
     });
