@@ -238,6 +238,31 @@ h1 .accent{
   18%{opacity:1}
   100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% - 96px)) scale(1.1) rotate(var(--rot,0deg))}
 }
+/* 천장에 쿵 */
+.fx-bonk{
+  position:absolute;width:64px;height:26px;border-radius:50%;
+  border:2px solid rgba(150,190,255,.85);
+  background:radial-gradient(closest-side,rgba(255,255,255,.9),rgba(255,255,255,0) 72%);
+  transform:translate(-50%,-50%);
+  animation:bonkPulse .45s ease-out forwards;
+}
+@keyframes bonkPulse{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+  30%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
+}
+/* 졸고 있을 때 피어오르는 z */
+.fx-zzz{
+  position:absolute;font-weight:700;line-height:1;
+  color:rgba(138,162,240,.8);text-shadow:0 0 8px rgba(170,190,255,.5);
+  transform:translate(-50%,-50%);
+  animation:zzzRise 2.4s ease-out forwards;
+}
+@keyframes zzzRise{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + 20px),calc(-50% - 74px)) scale(1.25)}
+}
 
 /* speech bubble */
 .pet-world .bubble{
@@ -270,7 +295,7 @@ h1 .accent{
 }
 @media(prefers-reduced-motion:reduce){
   .pet-world .badge{animation:none}
-  .fx-spark,.fx-heart,.fx-rise{animation:none;opacity:0}
+  .fx-spark,.fx-heart,.fx-rise,.fx-bonk,.fx-zzz{animation:none;opacity:0}
 }
 
 /* ---------- section shells ---------- */
@@ -591,7 +616,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   }
 
 
-/* ---------- 와이드 펫: 실제 털 이미지 + 2.5D 물리 ---------- */
+/* ---------- 와이드 펫: 실제 털 이미지 + 2.5D 물리 + 헬로펫식 자율 이벤트 ---------- */
 (function () {
   const world = document.getElementById('pet-world');
   const actor = document.getElementById('pet-actor');
@@ -605,20 +630,27 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   const rand = (a, b) => a + Math.random() * (b - a);
   const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 
-  const TAP_LINES = [
-    '응? 불렀어?',
-    '폴짝!',
-    '오늘도 코드 한 줄 정리 중!',
-    '로봇 이야기 좋아해?',
-    '궁금한 거 있으면 DM 걸어줘'
-  ];
-  const PET_LINES = [
-    '기분 좋다…',
-    '부르르…',
-    '보송보송하지?',
-    '계속 쓰다듬어도 돼',
-    '거기, 조금 더…'
-  ];
+  const LINES = {
+    tap: [
+      '응? 불렀어?',
+      '폴짝!',
+      '오늘도 코드 한 줄 정리 중!',
+      '로봇 이야기 좋아해?',
+      '궁금한 거 있으면 DM 걸어줘'
+    ],
+    pet: [
+      '기분 좋다…',
+      '부르르…',
+      '보송보송하지?',
+      '계속 쓰다듬어도 돼',
+      '거기, 조금 더…'
+    ],
+    bonk: ['아야!', '머리 박았어…', '쿵!', '천장이 여기까지야'],
+    flee: ['그만 만져!', '나 저기 갈래', '흥!', '싫어, 도망갈래'],
+    mad: ['흥!', '아직 삐졌어', '저리 가…'],
+    sleep: ['졸려…', '잠깐만 눈 붙일게', 'zzz'],
+    wake: ['깜짝이야', '!', '안 졸아!']
+  };
 
   /* 같은 대사가 연달아 나오지 않도록 한 바퀴 섞어 쓰기 */
   const bags = new WeakMap();
@@ -668,6 +700,17 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     }
   }
 
+  function bonkFx() {
+    if (reduce.matches) return;
+    const s = document.createElement('span');
+    s.className = 'fx-bonk';
+    s.style.left = (S.x + S.D / 2).toFixed(1) + 'px';
+    s.style.top = (S.floorY - S.D - S.y + 8).toFixed(1) + 'px';
+    s.addEventListener('animationend', () => s.remove());
+    fx.appendChild(s);
+    setTimeout(() => s.remove(), 900);
+  }
+
   function riseHearts(n) {
     if (reduce.matches) return;
     const cx = S.x + S.D / 2;
@@ -688,6 +731,19 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     }
   }
 
+  function zzz() {
+    if (reduce.matches) return;
+    const s = document.createElement('span');
+    s.className = 'fx-zzz';
+    s.textContent = 'z';
+    s.style.left = (S.x + S.D * 0.74).toFixed(1) + 'px';
+    s.style.top = (S.floorY - S.D - S.y + S.D * 0.3).toFixed(1) + 'px';
+    s.style.fontSize = (11 + Math.random() * 6).toFixed(1) + 'px';
+    s.addEventListener('animationend', () => s.remove());
+    fx.appendChild(s);
+    setTimeout(() => s.remove(), 2600);
+  }
+
   /* ---------- 상태 ---------- */
   const G = 2400;            // px/s²
   const S = {
@@ -696,6 +752,8 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     sq: 1, sqT: 1,
     rot: 0, rotT: 0, lean: 0, leanT: 0,
     petting: false, petMix: 0, petAcc: 0, nextPetLine: 0, happyUntil: 0,
+    grabbed: false, dozing: false, mad: false, madUntil: 0, bonkUntil: 0,
+    lastTouch: 0, touchTimes: [], dodgeUntil: 0,
     ready: false
   };
   let T = 0;
@@ -736,9 +794,14 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   function render() {
     const stretch = clamp(S.vy * 0.00018, -0.08, 0.14);
     const breath = S.y > 1 ? 0 : Math.sin(T * 1.7) * 0.016 + Math.sin(T * 2.6 + 0.9) * 0.006;
-    const sy = clamp(S.sq * (1 + stretch + breath), 0.7, 1.22);
+    let sy = clamp(S.sq * (1 + stretch + breath), 0.7, 1.22);
+    let rot = S.rot + Math.sin(T * 62) * 2.4 * S.petMix;
+    if (S.dozing) {
+      sy *= 0.985;
+      rot += Math.sin(T * 1.1) * 3.2;
+    }
+    if (S.grabbed) sy = clamp(sy * 1.04, 0.85, 1.2);
     const sx = 1 + (1 - sy) * 0.55;
-    const rot = S.rot + Math.sin(T * 62) * 2.4 * S.petMix;
     const top = S.floorY - S.D - S.y;
 
     actor.style.transform =
@@ -746,7 +809,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       ' rotate(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')';
 
     const lift = clamp(S.y / Math.max(1, S.maxH), 0, 1);
-    const ss = 1 - lift * 0.34;
+    const ss = (1 - lift * 0.34) * (S.grabbed ? 1.05 : 1);
     shadow.style.transform =
       'translate3d(' + (S.x + S.D / 2).toFixed(1) + 'px,' + (S.floorY + 3).toFixed(1) + 'px,0)' +
       ' translate(-50%,-50%) scale(' + ss.toFixed(3) + ',' + (ss * 0.94).toFixed(3) + ')';
@@ -754,38 +817,55 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   }
 
   function update(dt) {
+    if (S.mad && T > S.madUntil) S.mad = false;
+
     /* 기울기·기대기 부드럽게 */
     S.rot += (S.rotT - S.rot) * Math.min(1, dt * 8);
     S.lean += (S.leanT - S.lean) * Math.min(1, dt * 8);
     S.petMix += ((S.petting ? 1 : 0) - S.petMix) * Math.min(1, dt * (S.petting ? 16 : 4));
 
-    /* 세로: 중력 + 천장 상한 */
-    S.vy -= G * dt;
-    S.y += S.vy * dt;
-    if (S.y >= S.maxH) {
-      S.y = S.maxH;
-      if (S.vy > 0) S.vy = 0;
-    }
-    if (S.y <= 0) {
-      const impact = -S.vy;
-      S.y = 0;
-      if (impact > 300) {
-        S.vy = impact * 0.2;
-        S.sqT = clamp(1 - impact / 2400, 0.76, 0.94);
-      } else {
-        S.vy = 0;
-        if (impact > 70) S.sqT = clamp(1 - impact / 1500, 0.86, 0.98);
+    if (!S.grabbed) {
+      /* 세로: 중력 + 천장 쿵 */
+      S.vy -= G * dt;
+      S.y += S.vy * dt;
+      if (S.y >= S.maxH) {
+        S.y = S.maxH;
+        if (S.vy > 0) {
+          /* 천장에 부딪히면 찌그러졌다가 중력으로 툭 */
+          S.vy = -Math.max(150, S.vy * 0.34);
+          if (T > S.bonkUntil) {
+            S.bonkUntil = T + 0.9;
+            S.sqT = 0.74;
+            say(pickLine(LINES.bonk), 1800);
+            bonkFx();
+            burst(S.x + S.D / 2, S.floorY - S.D - S.y + 14, 6, 0.15);
+          }
+        }
       }
-      S.vx = 0;
-    }
+      if (S.y <= 0) {
+        const impact = -S.vy;
+        S.y = 0;
+        if (impact > 300) {
+          S.vy = impact * 0.2;
+          S.sqT = clamp(1 - impact / 2400, 0.76, 0.94);
+        } else {
+          S.vy = 0;
+          if (impact > 70) S.sqT = clamp(1 - impact / 1500, 0.86, 0.98);
+        }
+        S.vx = 0;
+      }
 
-    /* 가로: 이동 + 벽 */
-    if (S.vx) {
-      S.x += S.vx * dt;
-      const minX = 8;
-      const maxX = S.w - S.D - 8;
-      if (S.x < minX) { S.x = minX; S.vx = Math.abs(S.vx) * 0.45; }
-      if (S.x > maxX) { S.x = maxX; S.vx = -Math.abs(S.vx) * 0.45; }
+      /* 가로: 이동 + 벽 */
+      if (S.vx) {
+        S.x += S.vx * dt;
+        const minX = 8;
+        const maxX = S.w - S.D - 8;
+        if (S.x < minX) { S.x = minX; S.vx = Math.abs(S.vx) * 0.45; }
+        if (S.x > maxX) { S.x = maxX; S.vx = -Math.abs(S.vx) * 0.45; }
+      }
+    } else {
+      S.vy = 0;
+      S.vx = 0;
     }
 
     /* 스쿼시 & 스트레치 복원 */
@@ -795,64 +875,143 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     if (bubble.classList.contains('show')) placeBubble();
   }
 
+  /* ---------- 만짐 카운트: 너무 많이 건드리면 도망 ---------- */
+  function touch() {
+    S.lastTouch = T;
+    S.touchTimes = S.touchTimes.filter((t) => T - t < 3.6);
+    S.touchTimes.push(T);
+    if (!S.mad && !S.grabbed && S.touchTimes.length >= 6) flee();
+  }
+
+  function hopTo(dir, dist, h) {
+    const air = (2 * Math.sqrt(2 * G * h)) / G;
+    S.vy = Math.sqrt(2 * G * h);
+    S.vx = (dir * dist) / air;
+    S.sqT = 0.9;
+    return air * 1000 + 80;
+  }
+
+  async function flee() {
+    if (S.mad) return;
+    S.mad = true;
+    S.madUntil = T + 6500;
+    S.petting = false;
+    S.grabbed = false;
+    S.dozing = false;
+    S.touchTimes = [];
+    S.rotT = 0;
+    say(pickLine(LINES.flee), 2200);
+    const ballCx = S.x + S.D / 2;
+    const targetX = ballCx < S.w / 2 ? S.w - S.D - 14 : 14;
+    for (let i = 0; i < 3; i++) {
+      const remain = Math.abs(targetX - S.x);
+      if (remain < 14) break;
+      const dir = targetX > S.x ? 1 : -1;
+      const dist = Math.min(remain, rand(70, 130));
+      await wait(hopTo(dir, dist, rand(24, 36)));
+      if (S.grabbed) return;
+    }
+    S.rotT = rand(-6, 6);
+  }
+
   /* ---------- 클릭 / 탭 ---------- */
   function poke(px, py) {
+    if (S.mad) {
+      say(pickLine(LINES.mad), 1400);
+      return;
+    }
+    S.dozing = false;
     const grounded = S.y <= 3;
     if (grounded) {
       S.sqT = 0.8;
       setTimeout(() => {
-        if (S.y > 3) return;                        /* 그 사이 떠올랐으면 무시 */
-        const h = Math.min(92, S.maxH * 0.92);
+        if (S.y > 3 || S.grabbed) return;        /* 그 사이 떠올랐으면 무시 */
+        const big = Math.random() < 0.3;          /* 가끔은 천장까지 크게 */
+        const h = big ? S.maxH : Math.min(92, S.maxH * 0.9);
         S.vy = Math.sqrt(2 * G * h);
         S.vx = (Math.random() < 0.5 ? -1 : 1) * rand(20, 72);
         S.sqT = 1.12;
       }, 55);
     } else {
-      /* 공중 클릭: 남은 높이 안에서만 살짝 재점프 (무한 상승 방지) */
+      /* 공중 클릭: 남은 높이 안에서만 살짝 재점프 (천장 밖으로 못 나감) */
       const up = Math.max(0, S.vy);
       const apex = S.y + (up * up) / (2 * G);
       const room = S.maxH - apex;
-      if (room > 12) {
-        const h = Math.min(room * 0.5, 24);
+      if (room > 6) {
+        const h = Math.min(room * 0.7, 26);
         S.vy = Math.min(up + Math.sqrt(2 * G * h), 980);
         S.sqT = 1.06;
       }
     }
-    say(pickLine(TAP_LINES), 2600);
+    say(pickLine(LINES.tap), 2600);
     burst(px, py, 7, 0.4);
+    touch();
   }
 
   /* ---------- 쓰다듬기 ---------- */
   function petBy(dist) {
+    S.lastTouch = T;
+    if (S.mad) return;
+    S.dozing = false;
     S.petting = true;
     S.petAcc += Math.min(dist, 40);
     S.happyUntil = T + 2.4;
     if (S.petAcc > 110 && T > S.nextPetLine) {
       S.petAcc = 0;
       S.nextPetLine = T + 1.6;
-      say(pickLine(PET_LINES), 2600);
+      say(pickLine(LINES.pet), 2600);
       riseHearts(5);
+      touch();
     }
   }
   function endPet() { S.petting = false; }
 
+  /* ---------- 잡아 들기 / 던지기 ---------- */
+  function startGrab() {
+    S.grabbed = true;
+    S.petting = false;
+    S.dozing = false;
+    S.rotT = 0;
+    S.leanT = 0;
+    S.sqT = 1.05;
+  }
+  function moveGrab(p) {
+    const floorTop = S.floorY - S.D;
+    S.y = clamp(floorTop - (p.y - S.D / 2), 0, S.maxH);
+    S.x = clamp(p.x - S.D / 2, 6, Math.max(6, S.w - S.D - 6));
+  }
+  function releaseGrab(vx, vy) {
+    S.grabbed = false;
+    S.vx = clamp(vx, -1300, 1300);
+    S.vy = clamp(-vy, -500, 1500);
+    S.sqT = 1.06;
+    if (S.y <= 0) S.vy = Math.max(S.vy, 0);
+  }
+
   /* ---------- 포인터 ---------- */
-  let down = false, pid = null, downX = 0, downY = 0, downT = 0, lastX = 0, lastY = 0, moved = 0;
+  let down = false, pid = null, downX = 0, downY = 0, downT = 0, lastX = 0, lastY = 0, moved = 0, pathLen = 0;
+  let velX = 0, velY = 0, lastMoveT = 0;
 
   function worldPoint(e) {
     const r = world.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
-  /* 마우스가 가까이 오면 그쪽으로 살짝 기울여 봄 */
+  /* 마우스가 가까이 오면 그쪽으로 살짝 기울여 봄 / 삐진 동안엔 피함 */
   world.addEventListener('pointermove', (e) => {
-    if (e.pointerType !== 'mouse') return;
+    if (e.pointerType !== 'mouse' || down) return;
     const p = worldPoint(e);
     const cx = S.x + S.D / 2;
     const dx = p.x - cx;
     const near = Math.abs(dx) < Math.max(240, S.D * 1.5) && p.y > S.h * 0.3;
     S.rotT = near ? clamp(dx * 0.022, -7, 7) : 0;
     S.leanT = near ? clamp(dx * 0.02, -9, 9) : 0;
+    if (S.mad && near && Math.abs(dx) < 170 && T > S.dodgeUntil) {
+      const dir = dx > 0 ? -1 : 1;
+      S.vy = Math.sqrt(2 * G * 24);
+      S.vx = dir * 150;
+      S.dodgeUntil = T + 0.9;
+    }
   });
   world.addEventListener('pointerleave', () => {
     if (!down) { S.rotT = 0; S.leanT = 0; }
@@ -865,7 +1024,10 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     downX = lastX = e.clientX;
     downY = lastY = e.clientY;
     downT = performance.now();
+    lastMoveT = downT;
     moved = 0;
+    pathLen = 0;
+    velX = velY = 0;
     S.sqT = Math.min(S.sqT, 0.95);
     if (e.pointerType === 'mouse') { S.rotT = 0; S.leanT = 0; }
     try { actor.setPointerCapture(e.pointerId); } catch (err) {}
@@ -879,6 +1041,26 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     const dist = Math.hypot(dx, dy);
     if (dist < 0.8) return;
     moved += dist;
+    pathLen += dist;
+
+    const now = performance.now();
+    const sdt = Math.max(8, now - lastMoveT) / 1000;
+    lastMoveT = now;
+    velX += (dx / sdt - velX) * 0.45;
+    velY += (dy / sdt - velY) * 0.45;
+
+    /* 한 방향으로 쭉 끌면 '잡아 들기', 문지르면 '쓰다듬기' */
+    const net = Math.hypot(e.clientX - downX, e.clientY - downY);
+    if (!S.grabbed && net > 64 && pathLen < net * 1.9 && now - downT > 70) {
+      startGrab();
+    }
+    if (S.grabbed) {
+      moveGrab(worldPoint(e));
+      S.rotT = clamp(velX * 0.012, -10, 10);
+      S.lastTouch = T;
+      return;
+    }
+
     if (e.pointerType !== 'mouse') {
       const tx = Math.abs(e.clientX - downX), ty = Math.abs(e.clientY - downY);
       if (ty > 10 && ty > tx * 1.25) return;      /* 세로 스크롤은 방해하지 않음 */
@@ -893,15 +1075,23 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     if (!down || e.pointerId !== pid) return;
     down = false;
     pid = null;
-    endPet();
     try { actor.releasePointerCapture(e.pointerId); } catch (err) {}
+    if (S.grabbed) {
+      releaseGrab(velX, velY);
+      return;
+    }
+    endPet();
     if (moved < 10 && performance.now() - downT < 650) {
       const p = worldPoint(e);
       poke(clamp(p.x, 14, S.w - 14), clamp(p.y, 14, S.h - 14));
     }
   });
 
-  actor.addEventListener('pointercancel', () => { down = false; pid = null; endPet(); });
+  actor.addEventListener('pointercancel', () => {
+    down = false;
+    pid = null;
+    endPet();
+  });
 
   actor.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
@@ -909,28 +1099,68 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     poke(S.x + S.D / 2, S.floorY - S.D - S.y + S.D * 0.45);
   });
 
-  /* ---------- 가만히 둘 때: 숨쉬기 + 가끔 톡톡 ---------- */
-  async function live() {
-    await wait(1000);
-    while (true) {
-      if (reduce.matches) { await wait(4000); continue; }
-      if (S.petting || S.y > 1 || down) { await wait(320); continue; }
-      const n = Math.random() < 0.28 ? 2 : 1;
-      for (let i = 0; i < n; i++) {
-        if (S.petting || down) break;
-        let dir;
-        if (S.x < 30) dir = 1;
-        else if (S.x > S.w - S.D - 30) dir = -1;
-        else dir = Math.random() < 0.5 ? -1 : 1;
-        const h = rand(14, 30);
-        const air = (2 * Math.sqrt(2 * G * h)) / G;
-        S.vy = Math.sqrt(2 * G * h);
-        S.vx = (dir * rand(26, 70)) / air;
-        S.rotT = clamp(dir * 3.5, -4, 4);
-        await wait(air * 1000 + 110);
+  /* ---------- 자율 생활 ---------- */
+  async function walk(steps) {
+    for (let i = 0; i < steps; i++) {
+      if (S.grabbed || S.petting || S.mad || S.dozing || down) return;
+      let dir = S.walkDir || (Math.random() < 0.5 ? -1 : 1);
+      if (S.x < 40) dir = 1;
+      if (S.x > S.w - S.D - 40) dir = -1;
+      S.walkDir = dir;
+      S.rotT = dir * 3.2;
+      await wait(hopTo(dir, rand(48, 96), rand(12, 26)));
+      if ((S.x < 46 && dir < 0) || (S.x > S.w - S.D - 46 && dir > 0)) {
+        /* 벽에 닿으면 방향 틀기 */
+        S.walkDir = -dir;
+        S.sqT = 0.9;
+        S.rotT = -dir * 4;
+        await wait(180);
       }
-      S.rotT = 0;
-      await wait(rand(2400, 5400));
+      await wait(rand(60, 200));
+    }
+    S.rotT = 0;
+  }
+
+  async function headTilt() {
+    S.rotT = rand(-9, 9);
+    S.leanT = rand(-5, 5);
+    await wait(rand(600, 1200));
+    S.rotT = 0;
+    S.leanT = 0;
+  }
+
+  async function doze() {
+    if (S.dozing || S.mad || S.grabbed) return;
+    S.dozing = true;
+    const startTouch = S.lastTouch;
+    say(pickLine(LINES.sleep), 2600);
+    const until = T + rand(4200, 7200);
+    let z = 0;
+    while (T < until && S.dozing) {
+      if (S.lastTouch !== startTouch) break;      /* 누가 건드리면 깸 */
+      if (z++ % 2 === 0) zzz();
+      await wait(rand(620, 900));
+      if (S.grabbed) { S.dozing = false; return; }
+    }
+    S.dozing = false;
+    if (S.grabbed || S.petting) return;
+    S.vy = Math.sqrt(2 * G * 20);
+    S.sqT = 1.08;
+    say(pickLine(LINES.wake), 1100);
+  }
+
+  async function live() {
+    await wait(900);
+    while (true) {
+      if (reduce.matches) { await wait(3500); continue; }
+      if (S.grabbed || S.petting || S.mad || S.dozing || S.y > 1 || down) { await wait(280); continue; }
+      if (T - S.lastTouch > 15 && Math.random() < 0.5) { await doze(); continue; }
+      const r = Math.random();
+      if (r < 0.54) await walk(2 + (Math.random() < 0.45 ? 1 : 0));
+      else if (r < 0.78) await headTilt();
+      else if (r < 0.92) { S.sqT = 0.94; await wait(hopTo(Math.random() < 0.5 ? -1 : 1, rand(6, 26), rand(8, 16))); }
+      else await wait(rand(1000, 2200));
+      await wait(rand(700, 2400));
     }
   }
 
