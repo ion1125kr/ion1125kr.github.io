@@ -160,6 +160,7 @@ h1 .accent{
   margin-top:44px;
   border-radius:32px;overflow:hidden;
   background:
+    linear-gradient(180deg,rgba(255,255,255,0) 86%,rgba(226,241,255,.5) 90%,rgba(248,253,255,.92) 100%),
     linear-gradient(180deg,rgba(255,255,255,0) 56%,rgba(255,255,255,.8) 100%),
     radial-gradient(120% 86% at 50% -16%,#ffffff 0%,#f3faff 44%,#dceeff 100%);
   border:1px solid rgba(255,255,255,.92);
@@ -167,7 +168,7 @@ h1 .accent{
   touch-action:pan-y;
 }
 .pet-world .badge{
-  position:absolute;z-index:6;left:18px;bottom:16px;
+  position:absolute;z-index:6;right:16px;top:14px;left:auto;bottom:auto;
   display:flex;align-items:center;gap:9px;
   background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
   border:1px solid var(--line);border-radius:999px;
@@ -263,7 +264,7 @@ h1 .accent{
 @media(max-width:860px){
   .hero{padding:44px 0 58px}
   .pet-world{height:clamp(236px,44vw,272px);margin-top:30px;border-radius:26px}
-  .pet-world .badge{left:12px;bottom:12px;font-size:12px;padding:8px 13px 8px 10px}
+  .pet-world .badge{right:10px;top:10px;font-size:12px;padding:8px 13px 8px 10px}
   .pet-world .bubble{max-width:78%;font-size:13px}
   .hero-note{font-size:13px}
 }
@@ -704,7 +705,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     if (!r.width) return;
     S.w = r.width;
     S.h = r.height;
-    S.D = Math.round(clamp(S.h * 0.56, 112, 178));
+    S.D = Math.round(clamp(S.h * 0.60, 118, 214));
     S.floorY = S.h - Math.max(18, Math.round(S.h * 0.1));
     /* 천장: 무대 위쪽으로 나가지 않도록 최고 높이 상한 */
     S.maxH = Math.max(42, S.floorY - S.D - 10);
