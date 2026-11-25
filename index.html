@@ -1070,8 +1070,9 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       return tex;
     };
 
-    const bumpTex = makeGrayTex((u, v) => 0.30 + (pfbm(u * 16, v * 16, 16, 4) * 0.55 + pnoise(u * 96, v * 96, 96) * 0.45) * 0.50);
-    bumpTex.repeat.set(8, 5);
+    const bumpTex = makeGrayTex((u, v) => 0.22 + (pfbm(u * 16, v * 16, 16, 4) * 0.5 + pnoise(u * 96, v * 96, 96) * 0.5) * 0.78);
+    bumpTex.repeat.set(5, 3);
+    bumpTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
     const furTex = makeGrayTex((u, v) => {
       const n = pfbm(u * 46, v * 46, 46, 3);
@@ -1132,7 +1133,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       sheenRoughness: 0.7,
       sheenColor: new THREE.Color('#EDF2FF'),
       bumpMap: bumpTex,
-      bumpScale: 0.014
+      bumpScale: 0.028
     });
     body.add(new THREE.Mesh(ballGeo, baseMat));
 
@@ -1230,7 +1231,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       st.petting = true;
       st.lastPointer = t;
       st.petAcc += dist;
-      st.happyUntil = Math.max(st.happyUntil, t + 1.4);
+      st.happyUntil = Math.max(st.happyUntil, t + 2.6);
       if (st.petAcc > 130 && t > st.nextPetLine) {
         st.petAcc = 0;
         st.nextPetLine = t + 1.5;
@@ -1479,22 +1480,32 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     }
 
     let raf = 0;
+    let failed = false;
     const clock = new THREE.Clock();
-    function frame() {
-      raf = requestAnimationFrame(frame);
-      const dt = Math.min(clock.getDelta(), 0.05);
-      t += dt;
-      if (!st.vis) return;
-      update(dt);
-      renderer.render(scene, camera);
-    }
-
-    canvas.addEventListener('webglcontextlost', (e) => {
-      e.preventDefault();
+    function fail() {
+      if (failed) return;
+      failed = true;
       alive = false;
       cancelAnimationFrame(raf);
       figure.classList.remove('is-3d');
       if (typeof window.__ionFallback === 'function') window.__ionFallback();
+    }
+    function frame() {
+      raf = requestAnimationFrame(frame);
+      try {
+        const dt = Math.min(clock.getDelta(), 0.05);
+        t += dt;
+        if (!st.vis) return;
+        update(dt);
+        renderer.render(scene, camera);
+      } catch (err) {
+        fail();
+      }
+    }
+
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      fail();
     });
 
     resize();
