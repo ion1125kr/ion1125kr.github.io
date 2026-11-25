@@ -927,7 +927,7 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
       setTimeout(() => {
         if (S.y > 3 || S.grabbed) return;        /* 그 사이 떠올랐으면 무시 */
         const big = Math.random() < 0.3;          /* 가끔은 천장까지 크게 */
-        const h = big ? S.maxH : Math.min(92, S.maxH * 0.9);
+        const h = big ? S.maxH * 1.06 : Math.min(92, S.maxH * 0.9);
         S.vy = Math.sqrt(2 * G * h);
         S.vx = (Math.random() < 0.5 ? -1 : 1) * rand(20, 72);
         S.sqT = 1.12;
