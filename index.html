@@ -230,7 +230,7 @@ h1 .accent{
   position:absolute;transform:translate(-50%,-50%);
   line-height:1;color:rgba(150,162,246,.95);
   text-shadow:0 0 10px rgba(164,182,255,.55);
-  animation:fxRise 1.5s cubic-bezier(.2,.7,.3,1) forwards;
+  animation:fxRise 1.8s cubic-bezier(.2,.7,.3,1) forwards;
   will-change:transform,opacity;
 }
 @keyframes fxRise{
@@ -758,7 +758,6 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
     S.rot += (S.rotT - S.rot) * Math.min(1, dt * 8);
     S.lean += (S.leanT - S.lean) * Math.min(1, dt * 8);
     S.petMix += ((S.petting ? 1 : 0) - S.petMix) * Math.min(1, dt * (S.petting ? 16 : 4));
-    if (T > S.happyUntil) S.rotT *= Math.pow(0.2, dt);
 
     /* 세로: 중력 + 천장 상한 */
     S.vy -= G * dt;
