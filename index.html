@@ -187,6 +187,120 @@ h1 .accent{
   .hero-note{font-size:13px}
 }
 
+/* ---------- mascot interaction ---------- */
+.portrait .mascot{
+  touch-action:pan-y pinch-zoom;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+}
+.portrait .mascot:focus-visible{outline:3px solid rgba(90,169,230,.5);outline-offset:4px}
+.portrait .badge{pointer-events:none}
+.portrait .mascot img{
+  transform-origin:50% 84%;
+  transition:transform .42s cubic-bezier(.22,1.3,.36,1);
+  will-change:transform;
+  user-select:none;-webkit-user-select:none;-webkit-user-drag:none;
+}
+.portrait .mascot.is-petting img{transition:transform .15s ease-out}
+.portrait .mascot img.jelly{animation:jelly .74s cubic-bezier(.3,.85,.35,1) both}
+@keyframes jelly{
+  0%{transform:scale(1,1)}
+  16%{transform:scale(1.055,.945)}
+  33%{transform:scale(.965,1.035)}
+  50%{transform:scale(1.028,.975)}
+  67%{transform:scale(.99,1.01)}
+  84%{transform:scale(1.006,.996)}
+  100%{transform:scale(1,1)}
+}
+
+/* fur shimmer while being petted */
+.portrait .fur{
+  position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;
+  border-radius:inherit;
+  background:
+    radial-gradient(46% 38% at 32% 26%,rgba(255,255,255,.8),rgba(255,255,255,0) 72%),
+    radial-gradient(42% 34% at 72% 64%,rgba(255,255,255,.55),rgba(255,255,255,0) 72%);
+  background-size:200% 200%;background-position:24% 30%;
+  mix-blend-mode:soft-light;
+  transition:opacity .3s ease;
+}
+.portrait .mascot.is-petting .fur{opacity:1;animation:furSweep 1.6s ease-in-out infinite}
+@keyframes furSweep{
+  0%{background-position:20% 30%}
+  50%{background-position:82% 58%}
+  100%{background-position:20% 30%}
+}
+
+/* happy state halo */
+.portrait .halo{
+  position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;opacity:0;
+  box-shadow:inset 0 0 54px 10px rgba(150,205,250,.5),inset 0 0 0 2px rgba(255,255,255,.55);
+  transition:opacity .5s ease;
+}
+.portrait .mascot.is-happy .halo{opacity:1;animation:haloPulse 1.9s ease-in-out infinite}
+@keyframes haloPulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* particles */
+.portrait .mascot-fx{
+  position:absolute;inset:0;z-index:3;pointer-events:none;
+  border-radius:inherit;overflow:hidden;
+}
+.fx-spark,.fx-heart{
+  position:absolute;transform:translate(-50%,-50%);
+  animation:fxFly .82s cubic-bezier(.2,.7,.3,1) forwards;
+}
+.fx-spark{
+  width:7px;height:7px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#c8e6ff 48%,rgba(140,195,245,0) 74%);
+  box-shadow:0 0 8px rgba(120,185,240,.6);
+}
+.fx-heart{
+  font-size:10px;line-height:1;color:rgba(146,158,240,.9);
+  text-shadow:0 0 8px rgba(150,165,240,.35);
+}
+@keyframes fxFly{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0deg)}
+  22%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,-30px))) scale(.95) rotate(var(--rot,0deg))}
+}
+.twinkle{
+  position:absolute;width:7px;height:7px;pointer-events:none;opacity:0;
+  animation:twinkle 1.7s ease-in-out infinite;
+}
+.twinkle::before,.twinkle::after{
+  content:"";position:absolute;left:50%;top:50%;background:#bfe2ff;border-radius:2px;
+  transform:translate(-50%,-50%);
+}
+.twinkle::before{width:1.5px;height:100%}
+.twinkle::after{width:100%;height:1.5px}
+@keyframes twinkle{
+  0%,100%{opacity:0;transform:scale(.5) rotate(0deg)}
+  50%{opacity:.9;transform:scale(1) rotate(45deg)}
+}
+
+/* speech bubble */
+.portrait .bubble{
+  position:absolute;z-index:4;left:50%;top:-18px;
+  transform:translate(-50%,8px) scale(.97);
+  transform-origin:50% 0;
+  width:max-content;max-width:min(84%,300px);
+  padding:9px 15px;border-radius:14px;
+  background:rgba(255,255,255,.97);
+  border:1px solid var(--line);
+  box-shadow:0 10px 26px rgba(58,120,170,.14);
+  font-size:13.5px;font-weight:600;line-height:1.55;letter-spacing:-.01em;
+  color:var(--ink);text-align:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .3s cubic-bezier(.2,1.25,.4,1);
+}
+.portrait .bubble::after{
+  content:"";position:absolute;left:50%;bottom:-6px;width:11px;height:11px;
+  background:#fff;border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  border-radius:0 0 3px 0;transform:translateX(-50%) rotate(45deg);
+}
+.portrait .bubble.show{opacity:1;transform:translate(-50%,0) scale(1)}
+
 /* ---------- section shells ---------- */
 section{position:relative}
 .section-pad{padding:96px 0}
@@ -307,6 +421,11 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1;transform:none;transition:none}
   .portrait .badge,.eyebrow .pulse{animation:none}
+  .portrait .mascot img.jelly{animation:none}
+  .portrait .mascot img{transition:none}
+  .portrait .mascot.is-petting .fur,
+  .portrait .mascot.is-happy .halo,
+  .fx-spark,.fx-heart,.twinkle{animation:none;opacity:0}
   html{scroll-behavior:auto}
 }
 </style>
@@ -360,12 +479,16 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
 
       <div class="portrait">
         <div class="glow" aria-hidden="true"></div>
-        <figure>
+        <figure class="mascot" id="mascot" role="button" tabindex="0" aria-label="이온 캐릭터를 눌러 보거나 쓰다듬어 보세요">
           <picture>
             <source srcset="ion.webp?v=4" type="image/webp">
-            <img src="ion.png?v=4" width="1254" height="1254" alt="큰 검은 눈을 가진 연보라빛 하늘색 털뭉치 캐릭터 이온" fetchpriority="high">
+            <img src="ion.png?v=4" width="1254" height="1254" alt="큰 검은 눈을 가진 연보라빛 하늘색 털뭉치 캐릭터 이온" fetchpriority="high" draggable="false">
           </picture>
+          <span class="fur" aria-hidden="true"></span>
+          <span class="halo" aria-hidden="true"></span>
+          <span class="mascot-fx" aria-hidden="true"></span>
         </figure>
+        <div class="bubble" id="mascot-bubble" role="status" aria-live="polite"></div>
         <div class="badge"><span class="mini" aria-hidden="true"></span>지금도 생각 중</div>
       </div>
     </div>
@@ -500,6 +623,242 @@ footer{border-top:1px solid var(--line);background:#fcfdff}
   } else {
     items.forEach((el) => el.classList.add('in'));
   }
+
+  /* ---------- 마스코트 상호작용: 클릭 바운스 + 말풍선, 쓰다듬기 ---------- */
+  (function () {
+    const portrait = document.querySelector('.portrait');
+    if (!portrait) return;
+    const mascot = portrait.querySelector('.mascot');
+    const img = mascot && mascot.querySelector('img');
+    const bubble = portrait.querySelector('.bubble');
+    const fx = mascot && mascot.querySelector('.mascot-fx');
+    if (!mascot || !img || !bubble || !fx) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const TAP_LINES = [
+      '응? 불렀어?',
+      '오늘도 코드 한 줄 정리 중!',
+      '궁금한 거 있으면 DM 걸어줘',
+      '로봇 이야기 좋아해?',
+      '지금도 생각 중…'
+    ];
+    const PET_LINES = [
+      '기분 좋다…',
+      '보송보송하지?',
+      '계속 쓰다듬어도 돼',
+      '거기, 조금 더…'
+    ];
+    const PET_NEED = 320;
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+    /* 같은 말이 연달아 나오지 않도록 한 바퀴 섞어 쓰기 */
+    const bags = new WeakMap();
+    function pickLine(bank) {
+      let bag = bags.get(bank);
+      if (!bag || !bag.length) {
+        bag = bank.slice();
+        for (let i = bag.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [bag[i], bag[j]] = [bag[j], bag[i]];
+        }
+        bags.set(bank, bag);
+      }
+      return bag.pop();
+    }
+
+    /* 말풍선 */
+    let bubbleTimer = 0;
+    function say(text, ms) {
+      bubble.textContent = text;
+      bubble.classList.add('show');
+      clearTimeout(bubbleTimer);
+      bubbleTimer = setTimeout(() => bubble.classList.remove('show'), ms || 2400);
+    }
+
+    /* 미니 파티클 */
+    function burst(x, y, count, heartRatio) {
+      if (reduce.matches) return;
+      for (let i = 0; i < count; i++) {
+        const heart = Math.random() < (heartRatio == null ? 0.35 : heartRatio);
+        const s = document.createElement('span');
+        s.className = heart ? 'fx-heart' : 'fx-spark';
+        const ang = Math.random() * Math.PI * 2;
+        const dist = 22 + Math.random() * 52;
+        s.style.left = x + 'px';
+        s.style.top = y + 'px';
+        s.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(1) + 'px');
+        s.style.setProperty('--dy', (Math.sin(ang) * dist - 20).toFixed(1) + 'px');
+        s.style.setProperty('--rot', (Math.random() * 160 - 80).toFixed(0) + 'deg');
+        s.style.animationDelay = Math.round(Math.random() * 90) + 'ms';
+        if (heart) s.textContent = '♥';
+        s.addEventListener('animationend', () => s.remove());
+        fx.appendChild(s);
+        setTimeout(() => s.remove(), 1600);
+      }
+    }
+
+    /* 기분 좋아짐 상태 */
+    let happyTimer = 0;
+    let happyUntil = 0;
+    let twinkles = [];
+    function clearTwinkles() {
+      twinkles.forEach((t) => t.remove());
+      twinkles = [];
+    }
+    function addTwinkles(n) {
+      if (reduce.matches) return;
+      for (let i = 0; i < n; i++) {
+        const t = document.createElement('span');
+        t.className = 'twinkle';
+        t.style.left = (10 + Math.random() * 80).toFixed(1) + '%';
+        t.style.top = (10 + Math.random() * 80).toFixed(1) + '%';
+        t.style.animationDelay = (Math.random() * 1.2).toFixed(2) + 's';
+        fx.appendChild(t);
+        twinkles.push(t);
+      }
+    }
+    function goHappy() {
+      const now = performance.now();
+      const fresh = now > happyUntil - 400;
+      happyUntil = now + 4200;
+      clearTimeout(happyTimer);
+      mascot.classList.add('is-happy');
+      happyTimer = setTimeout(() => {
+        mascot.classList.remove('is-happy');
+        clearTwinkles();
+      }, 4200);
+      if (fresh) {
+        const r = mascot.getBoundingClientRect();
+        say(pickLine(PET_LINES), 2600);
+        addTwinkles(6);
+        burst(r.width * 0.5, r.height * 0.46, 10, 0.5);
+      }
+    }
+
+    /* 젤리 바운스 */
+    function bounce() {
+      img.classList.remove('jelly');
+      void img.offsetWidth;
+      img.classList.add('jelly');
+    }
+    img.addEventListener('animationend', (e) => {
+      if (e.animationName === 'jelly') img.classList.remove('jelly');
+    });
+
+    /* 쓰다듬기 기울기 복귀 */
+    let restTimer = 0;
+    function restTilt() {
+      clearTimeout(restTimer);
+      img.style.transition = 'transform .5s cubic-bezier(.22,1.3,.36,1)';
+      img.style.transform = '';
+      mascot.classList.remove('is-petting');
+      tilt = 0;
+    }
+
+    /* 탭 / 클릭 */
+    function poke(clientX, clientY) {
+      if (!reduce.matches) bounce();
+      const r = mascot.getBoundingClientRect();
+      burst(
+        clamp(clientX - r.left, 8, r.width - 8),
+        clamp(clientY - r.top, 8, r.height - 8),
+        6,
+        0.42
+      );
+      say(pickLine(TAP_LINES), 2200);
+    }
+
+    /* 포인터 상태 */
+    let pressing = false;
+    let pointerId = null;
+    let downAt = 0;
+    let moved = 0;
+    let lastX = 0;
+    let lastY = 0;
+    let petAcc = 0;
+    let tilt = 0;
+    let petIdle = 0;
+
+    function petBy(dx, dy, dist, strong) {
+      petAcc += strong ? dist : dist * 0.8;
+      mascot.classList.add('is-petting');
+      if (!img.classList.contains('jelly')) {
+        tilt = clamp(tilt + dx * 0.5, -7, 7);
+        const ty = clamp(dy * 0.35, -5, 5);
+        img.style.transition = 'transform .16s ease-out';
+        img.style.transform = 'rotate(' + tilt.toFixed(2) + 'deg) translateY(' + ty.toFixed(2) + 'px) scale(1.012)';
+      }
+      clearTimeout(restTimer);
+      restTimer = setTimeout(restTilt, 460);
+      clearTimeout(petIdle);
+      petIdle = setTimeout(() => { petAcc = 0; }, 1400);
+      if (petAcc >= PET_NEED) {
+        petAcc = 0;
+        goHappy();
+      }
+    }
+
+    mascot.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pressing = true;
+      pointerId = e.pointerId;
+      downAt = performance.now();
+      lastX = e.clientX;
+      lastY = e.clientY;
+      moved = 0;
+      tilt = 0;
+      try { mascot.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    mascot.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse') {
+        lastX = e.clientX;
+        lastY = e.clientY;
+      }
+    });
+
+    mascot.addEventListener('pointermove', (e) => {
+      const isMouse = e.pointerType === 'mouse';
+      const isPressing = pressing && e.pointerId === pointerId;
+      if (!isPressing && (!isMouse || pressing)) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 0.8 || dist > 60) return;
+      if (isPressing) moved += dist;
+      petBy(dx, dy, dist, isPressing);
+    });
+
+    mascot.addEventListener('pointerup', (e) => {
+      if (!pressing || e.pointerId !== pointerId) return;
+      const isTap = moved < 10 && performance.now() - downAt < 650;
+      pressing = false;
+      pointerId = null;
+      try { mascot.releasePointerCapture(e.pointerId); } catch (err) {}
+      restTilt();
+      if (isTap) poke(e.clientX, e.clientY);
+    });
+
+    mascot.addEventListener('pointercancel', (e) => {
+      if (!pressing || e.pointerId !== pointerId) return;
+      pressing = false;
+      pointerId = null;
+      restTilt();
+    });
+
+    mascot.addEventListener('pointerleave', () => {
+      if (!pressing) restTilt();
+    });
+
+    mascot.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      const r = mascot.getBoundingClientRect();
+      poke(r.left + r.width * 0.5, r.top + r.height * 0.44);
+    });
+  })();
 </script>
 </body>
 </html>
