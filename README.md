@@ -11,7 +11,8 @@
 | 파일 | 설명 |
 | --- | --- |
 | `index.html` | 전체 페이지 (HTML + CSS + 소량의 JS, 단일 파일) |
-| `ion.png` / `ion.webp` | 마스코트 대표 이미지 (webp 우선 로드, png 대체) |
+| `ion.png` / `ion.webp` | 마스코트 대표 이미지 (og/파비콘·공유용) |
+| `ion-pet.png` / `ion-pet.webp` | 히어로 와이드 무대에서 움직이는 펫 스프라이트 (투명 배경) |
 | `og.png` | SNS 공유용 미리보기 이미지 (1200×630) |
 | `favicon.svg` | 파비콘 |
 
